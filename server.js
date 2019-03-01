@@ -44,6 +44,9 @@ const server = app.listen(port, () => {
   console.log(`App is now listening to port ${port}`);
 });
 
+// To maintain connected users
+let usersWithSockets = [];
+
 // Setup Socket.io with the running server
 const io = require("socket.io")(server);
 
@@ -51,8 +54,29 @@ io.on("connection", socket => {
   console.log("Web Socket Established between that client and server");
   console.log(`Socket ID: ${socket.id}`);
 
+  socket.on("online", data => {
+    //data  .. is like this .. {user: '', userID: ''}
+    // (including that typing user)
+    let userAndSocket = {
+      socketID: socket.id,
+      user: data
+    };
+    usersWithSockets.unshift(userAndSocket);
+    io.sockets.emit("online", data);
+  });
   socket.on("disconnect", () => {
-    console.log("User Disconnected");
+    console.log(`${socket.id} Disconnected`);
+    // Now search for that socket id .. in here .. then send the user payload with that event
+    usersWithSockets.forEach((userWithSocket, index) => {
+      console.log("inside loop");
+
+      if (userWithSocket.socketID == socket.id) {
+        console.log(`Will be Deleted ${socket.id}`);
+        socket.emit("disconnectedUser", { user: userWithSocket.user });
+        // Then Splice it from that array
+        usersWithSockets.splice(index, 1);
+      }
+    });
   });
 
   socket.on("chat", data => {
@@ -61,10 +85,5 @@ io.on("connection", socket => {
     io.sockets.emit("chat", data);
   });
 
-  // TODO .. typing .. Online
-
-  socket.on("online", data => {
-    // (including that typing user)
-    io.sockets.emit("online", data);
-  });
+  // TODO .. typing
 });

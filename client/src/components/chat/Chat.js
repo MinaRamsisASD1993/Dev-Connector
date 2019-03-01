@@ -18,8 +18,23 @@ class Chat extends Component {
       this.props.history.push("/");
     }
 
-    socket.emit("online", { user: this.props.auth.user.name });
-    // socket.emit("chat", {  });
+    socket.emit("online", {
+      user: this.props.auth.user.name,
+      userID: this.props.auth.user.id
+    });
+    // data is like this {user: 'Mina'}
+    socket.on("online", data => {
+      this.setState({ onlineUsers: [data, ...this.state.onlineUsers] });
+    });
+
+    socket.on("disconnectedUser", data => {
+      // data is like this .. {user: '', userID: ''}
+      this.setState({
+        onlineUsers: this.state.onlineUsers.filter(
+          user => user.userID !== data.userID
+        )
+      });
+    });
     socket.on("chat", data => {
       const strHtml = `<p>
           <strong>${data.user}: </strong>
@@ -29,11 +44,6 @@ class Chat extends Component {
         messages: this.state.messages.concat(strHtml)
       });
       this.setState({ message: "" });
-    });
-
-    // data is like this {user: 'Mina'}
-    socket.on("online", data => {
-      this.setState({ onlineUsers: [data.user, ...this.state.onlineUsers] });
     });
   }
 
@@ -61,7 +71,7 @@ class Chat extends Component {
               <ul id="online-bloggers">
                 {this.state.onlineUsers.length > 0
                   ? this.state.onlineUsers.map((user, index) => (
-                      <li key={index}>{user}</li>
+                      <li key={index}>{user.user}</li>
                     ))
                   : null}
               </ul>

@@ -19,15 +19,16 @@ class Chat extends Component {
     }
 
     socket.emit("online", { user: this.props.auth.user.name });
-
+    // socket.emit("chat", {  });
     socket.on("chat", data => {
       const strHtml = `<p>
-          <strong>${this.props.auth.user.name}: </strong>
+          <strong>${data.user}: </strong>
           ${data.message}
         </p>`;
       this.setState({
         messages: this.state.messages.concat(strHtml)
       });
+      this.setState({ message: "" });
     });
 
     // data is like this {user: 'Mina'}
@@ -43,7 +44,10 @@ class Chat extends Component {
     e.preventDefault();
     const { message } = this.state;
     if (message !== "") {
-      socket.emit("chat", { message: message });
+      socket.emit("chat", {
+        message: message,
+        user: this.props.auth.user.name
+      });
     }
   };
   render() {

@@ -16,6 +16,7 @@ import Profile from "./components/profile/Profile";
 import ProfileByUserID from "./components/profile/ProfileByUserID";
 import Posts from "./components/posts/Posts";
 import Post from "./components/posts/Post";
+import Chat from "./components/chat/Chat";
 
 import jwt_decode from "jwt-decode";
 import { setAuthHeader } from "./utils/setAuthHeader";
@@ -76,6 +77,7 @@ class App extends Component {
               />
               <Route exact path="/feed" component={Posts} />
               <Route exact path="/post/:postID" component={Post} />
+              <Route exact path="/chat" component={Chat} />
             </div>
             <Footer />
           </div>

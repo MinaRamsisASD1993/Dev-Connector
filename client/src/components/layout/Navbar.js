@@ -37,6 +37,11 @@ class Navbar extends Component {
       output = (
         <ul className="navbar-nav ml-auto">
           <li className="nav-link">
+            <Link className="nav-link" to="/chat">
+              Live Chat
+            </Link>
+          </li>
+          <li className="nav-link">
             <Link className="nav-link postsLink" to="/feed">
               Post Feed
             </Link>

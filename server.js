@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const path = require("path");
+
 const app = express();
 
 // Load Keys
@@ -39,6 +40,26 @@ if (process.env.NODE_ENV === "production") {
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App is now listening to port ${port}`);
+});
+
+// Setup Socket.io with the running server
+const io = require("socket.io")(server);
+
+io.on("connection", socket => {
+  console.log("Web Socket Established between that client and server");
+  console.log(`Socket ID: ${socket.id}`);
+
+  socket.on("disconnect", () => {
+    console.log("User Disconnected");
+  });
+
+  socket.on("chat", data => {
+    // Send this data to all connected browsers connected To Server .. (including typing user)
+    // console.log(data.message);
+    io.sockets.emit("chat", data);
+  });
+
+  // TODO .. typing .. Online
 });

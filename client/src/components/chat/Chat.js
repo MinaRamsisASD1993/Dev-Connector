@@ -10,7 +10,8 @@ class Chat extends Component {
   state = {
     message: "",
     messages: "",
-    onlineUsers: []
+    onlineUsers: [],
+    userTyping: ""
   };
   // Private Route
   componentDidMount() {
@@ -22,19 +23,7 @@ class Chat extends Component {
       user: this.props.auth.user.name,
       userID: this.props.auth.user.id
     });
-    // data is like this {user: 'Mina'}
-    socket.on("online", data => {
-      this.setState({ onlineUsers: [data, ...this.state.onlineUsers] });
-    });
 
-    socket.on("disconnectedUser", data => {
-      // data is like this .. {user: '', userID: ''}
-      this.setState({
-        onlineUsers: this.state.onlineUsers.filter(
-          user => user.userID !== data.userID
-        )
-      });
-    });
     socket.on("chat", data => {
       const strHtml = `<p>
           <strong>${data.user}: </strong>
@@ -48,6 +37,14 @@ class Chat extends Component {
   }
 
   onChange = e => {
+    socket.emit("typing", {
+      user: this.props.auth.user.name
+    });
+    socket.on("typing", user => {
+      console.log("Typingggg front");
+      console.log(user);
+      this.setState({ userTyping: user });
+    });
     this.setState({ [e.target.name]: e.target.value });
   };
   onSubmit = e => {
@@ -61,7 +58,22 @@ class Chat extends Component {
     }
   };
   render() {
-    console.log(this.state.onlineUsers);
+    // console.log(this.state.onlineUsers);
+
+    // data is like this {user: 'Mina', userID: 'ID'}
+    socket.on("online", data => {
+      console.log(data);
+      this.setState({ onlineUsers: [data, ...this.state.onlineUsers] });
+    });
+
+    socket.on("disconnectedUser", data => {
+      // data is like this .. {user: '', userID: ''}
+      this.setState({
+        onlineUsers: this.state.onlineUsers.filter(
+          user => user.userID != data.userID
+        )
+      });
+    });
     return (
       <div className="container">
         <div className="row">
@@ -87,7 +99,13 @@ class Chat extends Component {
                   }}
                 />
 
-                <div id="feedback" />
+                <div id="feedback">
+                  {this.state.userTyping !== "" ? (
+                    <p>
+                      <strong>{this.state.userTyping} </strong>is now typing...
+                    </p>
+                  ) : null}
+                </div>
               </div>
               <form onSubmit={this.onSubmit}>
                 <input

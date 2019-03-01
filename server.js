@@ -51,10 +51,10 @@ let usersWithSockets = [];
 const io = require("socket.io")(server);
 
 io.on("connection", socket => {
-  console.log("Web Socket Established between that client and server");
-  console.log(`Socket ID: ${socket.id}`);
-
   socket.on("online", data => {
+    console.log("Web Socket Established between that client and server");
+    console.log(`Socket ID: ${socket.id}`);
+
     //data  .. is like this .. {user: '', userID: ''}
     // (including that typing user)
     let userAndSocket = {
@@ -62,16 +62,16 @@ io.on("connection", socket => {
       user: data
     };
     usersWithSockets.unshift(userAndSocket);
-    io.sockets.emit("online", data);
+    console.log(`Online Sockets:`);
+    usersWithSockets.forEach(item => console.log(item));
+    // io.sockets.emit("online", data);
+    socket.broadcast.emit("online", data);
   });
   socket.on("disconnect", () => {
     console.log(`${socket.id} Disconnected`);
     // Now search for that socket id .. in here .. then send the user payload with that event
     usersWithSockets.forEach((userWithSocket, index) => {
-      console.log("inside loop");
-
       if (userWithSocket.socketID == socket.id) {
-        console.log(`Will be Deleted ${socket.id}`);
         socket.emit("disconnectedUser", { user: userWithSocket.user });
         // Then Splice it from that array
         usersWithSockets.splice(index, 1);
@@ -85,5 +85,8 @@ io.on("connection", socket => {
     io.sockets.emit("chat", data);
   });
 
-  // TODO .. typing
+  socket.on("typing", user => {
+    console.log("server .. typinggggg");
+    socket.broadcast.emit("typing", user);
+  });
 });

@@ -43,7 +43,7 @@ class Chat extends Component {
     socket.on("typing", user => {
       console.log("Typingggg front");
       console.log(user);
-      this.setState({ userTyping: user });
+      this.setState({ userTyping: user.user });
     });
     this.setState({ [e.target.name]: e.target.value });
   };

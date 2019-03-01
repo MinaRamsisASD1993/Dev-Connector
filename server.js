@@ -62,4 +62,9 @@ io.on("connection", socket => {
   });
 
   // TODO .. typing .. Online
+
+  socket.on("online", data => {
+    // (including that typing user)
+    io.sockets.emit("online", data);
+  });
 });

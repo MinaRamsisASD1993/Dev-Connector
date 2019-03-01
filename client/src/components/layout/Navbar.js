@@ -36,11 +36,11 @@ class Navbar extends Component {
     if (isLoggedIn) {
       output = (
         <ul className="navbar-nav ml-auto">
-          <li className="nav-link">
+          {/* <li className="nav-link">
             <Link className="nav-link" to="/chat">
               Live Chat
             </Link>
-          </li>
+          </li> */}
           <li className="nav-link">
             <Link className="nav-link postsLink" to="/feed">
               Post Feed
